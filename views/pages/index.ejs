@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../partials/header.ejs %>
+<title>Web Application - Project 1</title>  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    
+    
+<script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>    
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+  
+<style>
+.tab{
+    border-collapse:collapse;
+    width: 50%;
+    margin-left:auto;
+    margin-right:auto;
+}
+th,td{
+    border-bottom: 2px groove white;
+    padding: 8px;
+    text-align: center;
+}
+tr:hover{
+background-color:#4B088A;
+}
+ html, body {
+        height: 100%;      
+}
+
+ </style>
+</head>
+<body align = "center">
+  <% include ../partials/nav.ejs %>
+<div class="jumbotron text-center">
+  <div class="container">
+ <h3>Click to know the tourists survey of top 10 attractions in the USA</h3>
+ <h5>(Scroll page to find information in the table, location in the map and survey in the chart)</h5>
+  <a type="button1" id="button1" class="btn btn-lg btn-primary"> Go>></a>
+     
+     &nbsp;
+  
+    <table id="tablee" class="center"></table>
+      &nbsp; 
+    <div id="map" style="width: 1135px; height: 350px;"></div>
+     &nbsp;
+<div id="chart_div" style="width: 1135px; height: 300px;" ></div>
+<script type="text/javascript">
+    
+var heading,tr,pl,t1,t2;
+$(document).ready(function(){
+    $("#button1").click(function(){
+	   $.get("/getItems", function(obj, status){
+         heading="<tr><th>Place Name</th><th>Tourists/year(2010)</th><th>Tourists/year(2015)</th></tr>";
+           $("#tablee").append(heading);
+    for(var i=0;i<obj.length;i++)
+    {
+         tr="<tr>";
+         pl="<td>"+obj[i]["place"]+"</td>";
+                 t1="<td>"+obj[i]["tourists1"]+"</td>";
+	 t2="<td>"+obj[i]["tourists2"]+"</td></tr>";
+     
+  $("#tablee").append(tr+pl+t1+t2);   
+
+    }   
+                 
+	 $("#tablee").addClass('tab');              
+
+    var infowindow = new google.maps.InfoWindow();
+
+    var marker, j,lat,long;
+    var locat=[];
+
+    for (j = 0; j < obj.length; j++) {
+        
+        lat=obj[j]["latitude"];
+        long=obj[j]["longitude"];
+        locat.push(obj[j]["location"]);
+    
+      marker = new google.maps.Marker({
+        position: new google.maps.LatLng(lat, long),
+        map: map
+      });
+
+      google.maps.event.addListener(marker, 'click', (function(marker, j) {
+        return function() {
+          infowindow.setContent(locat[j]);
+          infowindow.open(map, marker);
+        }
+      })(marker, j));
+    }
+     
+  
+        });
+ 
+   var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 4,
+      center: new google.maps.LatLng(37.09024,-95.712891),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawMultSeries);
+
+function drawMultSeries() {
+      var data = google.visualization.arrayToDataTable([
+        ['Place', '2015 Tourists', '2010 Tourists'],
+        ['Golden Gate Bridge', 8175000, 9008000],
+        ['Disney World', 123792000, 131694000],
+        ['Statue of Liberty', 76950002, 98960005],
+        ['Yellowstone National Park', 2099000, 3953000],
+        ['Great Smoky Mountains National Park', 4526000, 6517000],
+	['Times Square', 80355624, 11953000],
+	['Niagara Falls', 45692495, 59531340],
+	['Yosemite', 24963041, 32491554],
+	['Mount Rushmore', 54920935, 70495363],
+	['Glacier National Park', 23844576, 29495363]
+      ]);
+
+      var options = {
+        title: 'Survey of total tourists in 2010 and 2015',
+        chartArea: {width: '60%', height: '200%'},
+        hAxis: {
+          title: 'Approx Tourists',
+          minValue: 0
+        },
+        vAxis: {
+          title: 'Place'
+        }
+      };
+
+      var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+
+
+ });
+
+   });
+</script>   
+
+</div></div>
+</body>
+</html>
