@@ -37,8 +37,8 @@ In terminal,
 $heroku login
 <enter email and password>
 
-$git clone https://github.com/madhu6/cse5335-project-1.git
-$cd cse5335-project-1
+$git clone https://github.com/madhu6/mxv6048-cse5335-project-1.git
+$cd mxv6048-cse5335-project-1
 
 $heroku create
 $git push heroku master
